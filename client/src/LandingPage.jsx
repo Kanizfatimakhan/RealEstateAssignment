@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar, Container, Nav, Button, Row, Col, Form, Modal, Card } from 'react-bootstrap';
+// ---------------------------------------------------------
+// 🔴 FIX: Added 'Badge' to the imports below
+// ---------------------------------------------------------
+import { Navbar, Container, Nav, Button, Row, Col, Form, Modal, Card, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
