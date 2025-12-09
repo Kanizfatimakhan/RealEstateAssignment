@@ -5,8 +5,8 @@ import axios from 'axios';
 
 const API_BASE = "https://realestateassignment.onrender.com"; 
 
-// --- DUMMY DATA (Always Visible) ---
-const DUMMY_PROJECTS = [
+// --- INSTANT DATA (No Waiting) ---
+const DATA_PROJECTS = [
   { _id: '1', name: 'Modern Villa', description: 'Beverly Hills, CA', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80' },
   { _id: '2', name: 'Luxury Apartment', description: 'New York, NY', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80' },
   { _id: '3', name: 'Cozy Cottage', description: 'Aspen, CO', image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=600&q=80' },
@@ -15,16 +15,15 @@ const DUMMY_PROJECTS = [
   { _id: '6', name: 'Skyline Penthouse', description: 'Seattle, WA', image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80' }
 ];
 
-const DUMMY_CLIENTS = [
+const DATA_CLIENTS = [
   { _id: '1', name: 'Michael Ross', designation: 'CEO', description: 'DreamHome found me the perfect office space in record time.', image: 'https://randomuser.me/api/portraits/men/32.jpg' },
   { _id: '2', name: 'Sarah Jenkins', designation: 'Director', description: 'I sold my house above asking price thanks to their incredible strategy.', image: 'https://randomuser.me/api/portraits/women/44.jpg' },
   { _id: '3', name: 'David Chen', designation: 'Investor', description: 'The ROI analysis provided by DreamHome was spot on.', image: 'https://randomuser.me/api/portraits/men/85.jpg' },
 ];
 
 const LandingPage = () => {
-  // FIX: Initialize with data immediately so it is never empty
-  const [projects, setProjects] = useState(DUMMY_PROJECTS);
-  const [clients, setClients] = useState(DUMMY_CLIENTS);
+  const [projects, setProjects] = useState(DATA_PROJECTS);
+  const [clients, setClients] = useState(DATA_CLIENTS);
   const [contactForm, setContactForm] = useState({ fullName: '', email: '', mobile: '', city: '' });
   const [showModal, setShowModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -33,10 +32,8 @@ const LandingPage = () => {
     const fetchData = async () => {
       try {
         const p = await axios.get(`${API_BASE}/projects`);
-        const c = await axios.get(`${API_BASE}/clients`);
         if (p.data.length > 0) setProjects(p.data);
-        if (c.data.length > 0) setClients(c.data);
-      } catch (err) { console.log("Using fallback data"); }
+      } catch (err) { console.log("Using instant data"); }
     };
     fetchData();
   }, []);
@@ -67,14 +64,15 @@ const LandingPage = () => {
       </Navbar>
 
       <div id="home" style={{ position: 'relative', width: '100vw', minHeight: '100vh', background: "url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1950&q=80') center/cover", display: 'flex', alignItems: 'center', paddingTop: '80px' }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.3))' }}></div>
           <Container style={{ position: 'relative', zIndex: 2 }}>
             <Row className="align-items-center">
                 <Col lg={7} className="text-white mb-5 mb-lg-0">
-                    <h1 className="display-3 fw-bold my-3 text-shadow">Find Your Dream Place</h1>
-                    <p className="lead bg-dark p-2 d-inline-block bg-opacity-50 rounded">We don't just sell houses. We help you find a home.</p>
+                    <h1 className="display-3 fw-bold my-3">Find Your Dream Place</h1>
+                    <p className="lead">We don't just sell houses. We help you find a home.</p>
                 </Col>
                 <Col lg={5}>
-                    <div className="p-4 rounded-3 shadow-lg bg-white bg-opacity-75 backdrop-blur">
+                    <div className="p-4 rounded-3 shadow-lg bg-white">
                         <h3 className="fw-bold text-dark mb-3">Get a Quote</h3>
                         <Form onSubmit={handleContactSubmit}>
                             <Form.Control placeholder="Name" className="mb-3" onChange={e => setContactForm({...contactForm, fullName: e.target.value})}/>
@@ -119,29 +117,33 @@ const LandingPage = () => {
         </Container>
       </div>
 
-      {/* REVIEWS SECTION - FIXED RESPONSIVENESS */}
-      <Container id="testimonials" style={{ scrollMarginTop: '100px', padding: '60px 0' }} className="text-center">
-        <h2 className="fw-bold mb-5">Client Reviews</h2>
-        <Row className="justify-content-center g-4">
-            {clients.slice(0, 3).map((c, i) => (
-                // xs=12 ensures full width on phone, lg=4 ensures 3 columns on laptop
-                <Col key={i} lg={4} md={6} sm={12} xs={12}>
-                    <Card className="border-0 shadow-sm p-4 h-100">
-                        <div className="mx-auto mb-3"><img src={c.image} className="rounded-circle" width="80" height="80" style={{objectFit:'cover'}} /></div>
-                        <p className="fst-italic">"{c.description}"</p>
-                        <h6 className="fw-bold">{c.name}</h6>
-                        <small className="text-primary">{c.designation}</small>
-                    </Card>
-                </Col>
-            ))}
-        </Row>
-      </Container>
+      {/* REVIEWS: ALWAYS VISIBLE */}
+      <div id="testimonials" style={{ scrollMarginTop: '100px', padding: '80px 0', background: '#0e2e50' }}>
+        <Container className="text-center">
+            <h2 className="fw-bold mb-5 text-white">Client Stories</h2>
+            <Row className="justify-content-center g-4">
+                {clients.map((c, i) => (
+                    <Col key={i} lg={4} md={6} sm={12} xs={12}>
+                        <Card className="border-0 shadow-lg p-4 h-100">
+                            <div className="mx-auto mb-3"><img src={c.image} className="rounded-circle" width="80" height="80" style={{objectFit:'cover'}}/></div>
+                            <p className="fst-italic text-muted">"{c.description}"</p>
+                            <h6 className="fw-bold m-0">{c.name}</h6>
+                            <small className="text-primary fw-bold">{c.designation}</small>
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
+        </Container>
+      </div>
 
-      <div className="text-white py-4 text-center" style={{background:'#1a1a1a'}}><small>&copy; 2023 DreamHome.</small></div>
+      <div className="text-white py-4 text-center" style={{background:'#111'}}><small>&copy; 2023 DreamHome.</small></div>
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton><Modal.Title>{selectedProject?.name}</Modal.Title></Modal.Header>
-        <Modal.Body><img src={selectedProject?.image} className="img-fluid rounded mb-3 w-100" /><p>{selectedProject?.description}</p></Modal.Body>
+        <Modal.Body>
+            {selectedProject && <><img src={selectedProject.image} className="img-fluid rounded mb-3 w-100" /><p>{selectedProject.description}</p></>}
+            <Button className="w-100 fw-bold" style={{background:'#f05a28', border:'none'}}>Contact Agent</Button>
+        </Modal.Body>
       </Modal>
     </div>
   );

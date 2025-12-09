@@ -18,11 +18,9 @@ const AdminPanel = () => {
   const [recentProjects, setRecentProjects] = useState([]);
   const [clientsList, setClientsList] = useState([]);
 
-  // Forms
+  // Forms & Cropper
   const [projData, setProjData] = useState({ name: '', description: '', image: null });
   const [clientData, setClientData] = useState({ name: '', designation: '', description: '', image: null });
-  
-  // Cropper
   const [crop, setCrop] = useState();
   const [completedCrop, setCompletedCrop] = useState();
   const [imgSrc, setImgSrc] = useState('');
