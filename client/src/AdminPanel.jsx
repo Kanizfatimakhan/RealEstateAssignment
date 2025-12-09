@@ -106,15 +106,16 @@ const AdminPanel = () => {
   );
 
   return (
-    // MAIN WRAPPER: FLEXBOX LAYOUT (Solves the "Blank Right Side" issue)
+    // MAIN WRAPPER: FLEXBOX LAYOUT
     <div style={{ display: 'flex', width: '100vw', minHeight: '100vh', background: '#f0f2f5', fontFamily: "'Poppins', sans-serif", overflowX: 'hidden' }}>
       
       {/* 1. SIDEBAR (Fixed Width, Flex Shrink 0) */}
       <div style={{ width: '280px', background: '#0e2e50', minHeight: '100vh', flexShrink: 0, zIndex: 1000 }} className="d-flex flex-column py-4 shadow">
         <div className="px-4 mb-5">
+            {/* UPDATED NAME HERE */}
             <h4 className="fw-bold text-white m-0 d-flex align-items-center">
-                <i className="bi bi-pie-chart-fill me-2 text-primary"></i>
-                Real<span style={{color: '#00aaff'}}>Trust</span>
+                <i className="bi bi-house-heart-fill me-2 text-primary"></i>
+                Dream<span style={{color: '#00aaff'}}>Home</span>
             </h4>
             <small className="text-white-50 ms-4 ps-1" style={{fontSize:'0.65rem'}}>ADMIN DASHBOARD</small>
         </div>
@@ -137,7 +138,7 @@ const AdminPanel = () => {
         </div>
       </div>
 
-      {/* 2. MAIN CONTENT (Flex Grow 1 - Forces it to fill ALL remaining space) */}
+      {/* 2. MAIN CONTENT (Flex Grow 1) */}
       <div style={{ flexGrow: 1, padding: '30px', background: '#f0f2f5', minHeight: '100vh', overflowY: 'auto' }}>
         
         {/* Top Header */}
@@ -185,7 +186,7 @@ const AdminPanel = () => {
             </div>
         )}
 
-        {/* --- INQUIRIES TAB (Full Screen Table) --- */}
+        {/* --- INQUIRIES TAB --- */}
         {activeTab === 'inquiries' && (
             <Card className="border-0 shadow-sm w-100" style={{borderRadius: '12px'}}>
                 <div className="p-3 border-bottom d-flex justify-content-between align-items-center bg-white" style={{borderRadius: '12px 12px 0 0'}}>
@@ -227,13 +228,12 @@ const AdminPanel = () => {
             </Card>
         )}
 
-        {/* --- ADD PROJECT (Full Screen Split Layout) --- */}
+        {/* --- ADD PROJECT --- */}
         {activeTab === 'add_project' && (
             <Card className="border-0 shadow-sm w-100" style={{borderRadius: '12px', overflow:'hidden'}}>
                 <Card.Header className="bg-white py-3 px-4 fw-bold border-bottom text-primary">Add New Property</Card.Header>
                 <Card.Body className="p-0">
                     <Row className="g-0 w-100 m-0">
-                        {/* LEFT: FORM INPUTS */}
                         <Col lg={8} md={12} className="p-5 border-end">
                              <Row className="g-3">
                                  <Col md={12}>
@@ -246,7 +246,6 @@ const AdminPanel = () => {
                                  </Col>
                              </Row>
                         </Col>
-                        {/* RIGHT: IMAGE UPLOAD & ACTION */}
                         <Col lg={4} md={12} className="p-5 bg-light d-flex flex-column justify-content-center text-center">
                              <div className="mb-4">
                                 <div className="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center mx-auto mb-3" style={{width:'80px', height:'80px'}}>
@@ -265,7 +264,7 @@ const AdminPanel = () => {
             </Card>
         )}
 
-        {/* --- ADD CLIENT (Full Screen Split Layout) --- */}
+        {/* --- ADD CLIENT --- */}
         {activeTab === 'add_client' && (
              <Card className="border-0 shadow-sm w-100" style={{borderRadius: '12px', overflow:'hidden'}}>
                 <Card.Header className="bg-white py-3 px-4 fw-bold border-bottom text-warning">Add Testimonial</Card.Header>
