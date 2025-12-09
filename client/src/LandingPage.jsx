@@ -3,13 +3,19 @@ import { Navbar, Container, Nav, Button, Row, Col, Form, Modal, Card } from 'rea
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-// --- PROFESSIONAL REAL ESTATE DATA ---
+// ---------------------------------------------------------
+// 🔴 LIVE BACKEND CONNECTION
+// ---------------------------------------------------------
+const API_BASE = "https://realestateassignment.onrender.com"; 
+// ---------------------------------------------------------
+
+// --- DUMMY DATA (Fallback if database is empty) ---
 const DUMMY_PROJECTS = [
-  { _id: '1', name: 'Modern Villa', description: 'Beverly Hills, CA', details: 'A stunning modern villa located in the exclusive hills. Features 5 bedrooms, infinity pool, and smart home systems.', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=80' },
-  { _id: '2', name: 'Luxury Apartment', description: 'New York, NY', details: 'Penthouse suite with panoramic city views. Floor-to-ceiling windows and premium finishes throughout.', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=400&q=80' },
-  { _id: '3', name: 'Cozy Cottage', description: 'Aspen, CO', details: 'The perfect winter getaway. Features a stone fireplace, heated floors, and ski-in/ski-out access.', image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=400&q=80' },
-  { _id: '4', name: 'Urban Loft', description: 'Chicago, IL', details: 'Industrial-chic loft in the heart of downtown. Exposed brick walls and high ceilings.', image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=400&q=80' },
-  { _id: '5', name: 'Seaside Manor', description: 'Miami, FL', details: 'Historic art-deco restoration in South Beach. Direct beach access and private dock.', image: 'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=400&q=80' }
+  { _id: '1', name: 'Modern Villa', description: 'Beverly Hills, CA', details: 'A stunning modern villa located in the exclusive hills. Features 5 bedrooms, infinity pool, and smart home systems.', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80' },
+  { _id: '2', name: 'Luxury Apartment', description: 'New York, NY', details: 'Penthouse suite with panoramic city views. Floor-to-ceiling windows and premium finishes throughout.', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80' },
+  { _id: '3', name: 'Cozy Cottage', description: 'Aspen, CO', details: 'The perfect winter getaway. Features a stone fireplace, heated floors, and ski-in/ski-out access.', image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=600&q=80' },
+  { _id: '4', name: 'Urban Loft', description: 'Chicago, IL', details: 'Industrial-chic loft in the heart of downtown. Exposed brick walls and high ceilings.', image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=600&q=80' },
+  { _id: '5', name: 'Seaside Manor', description: 'Miami, FL', details: 'Historic art-deco restoration in South Beach. Direct beach access and private dock.', image: 'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=600&q=80' }
 ];
 
 const DUMMY_CLIENTS = [
@@ -17,13 +23,13 @@ const DUMMY_CLIENTS = [
   { _id: '2', name: 'Sarah Jenkins', designation: 'Homeowner', description: 'I sold my house above asking price thanks to their incredible marketing strategy. Highly recommended!', image: 'https://randomuser.me/api/portraits/women/44.jpg' },
   { _id: '3', name: 'David Chen', designation: 'Property Investor', description: 'The ROI analysis provided by Real Trust was spot on. They are true experts in the market.', image: 'https://randomuser.me/api/portraits/men/85.jpg' },
   { _id: '4', name: 'Emily Clark', designation: 'Interior Designer', description: 'A seamless experience from start to finish. The team really understood my vision.', image: 'https://randomuser.me/api/portraits/women/65.jpg' },
-  { _id: '5', name: 'Jessica Lee', designation: 'Architect', description: 'Their attention to detail and dedication to client satisfaction is truly impressive.', image: 'https://randomuser.me/api/portraits/women/33.jpg' },
 ];
 
 const LandingPage = () => {
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
   const [contactForm, setContactForm] = useState({ fullName: '', email: '', mobile: '', city: '' });
+  const [emailSub, setEmailSub] = useState('');
   
   // Modal State
   const [showModal, setShowModal] = useState(false);
@@ -32,11 +38,15 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const projRes = await axios.get('http://localhost:5000/projects');
+        // Fetch Projects from Live Server
+        const projRes = await axios.get(`${API_BASE}/projects`);
         setProjects(projRes.data.length > 0 ? projRes.data : DUMMY_PROJECTS);
-        const clientRes = await axios.get('http://localhost:5000/clients');
+        
+        // Fetch Clients from Live Server
+        const clientRes = await axios.get(`${API_BASE}/clients`);
         setClients(clientRes.data.length > 0 ? clientRes.data : DUMMY_CLIENTS);
       } catch (err) {
+        console.error("Using fallback data");
         setProjects(DUMMY_PROJECTS);
         setClients(DUMMY_CLIENTS);
       }
@@ -44,7 +54,27 @@ const LandingPage = () => {
     fetchData();
   }, []);
 
-  const handleContactSubmit = (e) => { e.preventDefault(); alert("Quote Request Sent Successfully!"); };
+  const handleContactSubmit = async (e) => { 
+      e.preventDefault(); 
+      try {
+          await axios.post(`${API_BASE}/contact`, contactForm);
+          alert("Quote Request Sent Successfully!");
+          setContactForm({ fullName: '', email: '', mobile: '', city: '' });
+      } catch (err) {
+          alert("Error sending request. Please try again.");
+      }
+  };
+
+  const handleSubscribe = async () => {
+      if(!emailSub) return;
+      try {
+          await axios.post(`${API_BASE}/subscribe`, { email: emailSub });
+          alert("Subscribed Successfully!");
+          setEmailSub('');
+      } catch (err) {
+          alert("Already subscribed or error occurred.");
+      }
+  };
 
   const handleReadMore = (project) => {
     setSelectedProject(project);
@@ -54,7 +84,7 @@ const LandingPage = () => {
   return (
     <div style={{ fontFamily: "'Poppins', sans-serif", overflowX: 'hidden', width: '100%' }}>
       
-      {/* 1. NAVBAR - Professional & Clean */}
+      {/* 1. NAVBAR */}
       <Navbar bg="white" expand="lg" fixed="top" className="shadow-sm py-3" style={{zIndex: 1000}}>
         <Container>
           <Navbar.Brand href="#" className="fw-bold fs-3" style={{ color: '#0e2e50', letterSpacing: '-0.5px' }}>
@@ -120,18 +150,18 @@ const LandingPage = () => {
                         
                         <Form onSubmit={handleContactSubmit}>
                             <Form.Group className="mb-3">
-                                <Form.Control placeholder="Full Name" style={{ background: '#fff', border: 'none', height: '50px' }} onChange={e => setContactForm({...contactForm, fullName: e.target.value})}/>
+                                <Form.Control placeholder="Full Name" style={{ background: '#fff', border: 'none', height: '50px' }} value={contactForm.fullName} onChange={e => setContactForm({...contactForm, fullName: e.target.value})}/>
                             </Form.Group>
                             <Form.Group className="mb-3">
-                                <Form.Control placeholder="Email Address" style={{ background: '#fff', border: 'none', height: '50px' }} onChange={e => setContactForm({...contactForm, email: e.target.value})}/>
+                                <Form.Control placeholder="Email Address" style={{ background: '#fff', border: 'none', height: '50px' }} value={contactForm.email} onChange={e => setContactForm({...contactForm, email: e.target.value})}/>
                             </Form.Group>
                             <Form.Group className="mb-3">
-                                <Form.Control placeholder="Mobile Number" style={{ background: '#fff', border: 'none', height: '50px' }} onChange={e => setContactForm({...contactForm, mobile: e.target.value})}/>
+                                <Form.Control placeholder="Mobile Number" style={{ background: '#fff', border: 'none', height: '50px' }} value={contactForm.mobile} onChange={e => setContactForm({...contactForm, mobile: e.target.value})}/>
                             </Form.Group>
                             <Form.Group className="mb-4">
-                                <Form.Control placeholder="City / Area" style={{ background: '#fff', border: 'none', height: '50px' }} onChange={e => setContactForm({...contactForm, city: e.target.value})}/>
+                                <Form.Control placeholder="City / Area" style={{ background: '#fff', border: 'none', height: '50px' }} value={contactForm.city} onChange={e => setContactForm({...contactForm, city: e.target.value})}/>
                             </Form.Group>
-                            <Button className="w-100 fw-bold py-3 rounded-1 shadow-sm" style={{ backgroundColor: '#f05a28', border: 'none', textTransform: 'uppercase', letterSpacing: '1px' }}>GET QUICK QUOTE</Button>
+                            <Button type="submit" className="w-100 fw-bold py-3 rounded-1 shadow-sm" style={{ backgroundColor: '#f05a28', border: 'none', textTransform: 'uppercase', letterSpacing: '1px' }}>GET QUICK QUOTE</Button>
                         </Form>
                     </div>
                 </Col>
@@ -202,7 +232,7 @@ const LandingPage = () => {
         </Container>
       </div>
 
-      {/* 5. TESTIMONIALS - IMPROVED DESIGN */}
+      {/* 5. TESTIMONIALS */}
       <div id="testimonials" className="py-5" style={{backgroundColor: '#f8f9fa'}}>
           <Container>
             <div className="text-center mb-5">
@@ -230,7 +260,7 @@ const LandingPage = () => {
           </Container>
       </div>
 
-      {/* 6. SUBSCRIBER SECTION - POLISHED */}
+      {/* 6. SUBSCRIBER SECTION */}
       <div id="contact" style={{ background: '#00aaff', padding: '70px 0', color: 'white' }}>
           <Container>
               <Row className="align-items-center">
@@ -239,12 +269,14 @@ const LandingPage = () => {
                       <p className="mb-0 text-white-50">Join our mailing list to receive the latest updates and exclusive offers directly to your inbox.</p>
                   </Col>
                   <Col md={6}>
-                      <Form className="d-flex justify-content-center justify-content-md-end">
-                          <Form.Control 
+                      <div className="d-flex justify-content-center justify-content-md-end">
+                          <input 
                             type="email" 
                             placeholder="Enter your email address" 
-                            className="me-2 border-0 shadow-sm" 
+                            className="form-control me-2 border-0 shadow-sm" 
                             style={{height: '50px', maxWidth: '300px', borderRadius: '4px'}}
+                            value={emailSub}
+                            onChange={(e) => setEmailSub(e.target.value)}
                           />
                           <Button 
                             style={{ 
@@ -253,14 +285,15 @@ const LandingPage = () => {
                                 background: '#333', 
                                 border: 'none', 
                                 fontWeight: 'bold', 
-                                letterSpacing: '1px',
+                                letterSpacing: '1px', 
                                 borderRadius: '4px'
                             }}
                             className="shadow-sm"
+                            onClick={handleSubscribe}
                           >
                             SUBSCRIBE
                           </Button>
-                      </Form>
+                      </div>
                   </Col>
               </Row>
           </Container>

@@ -3,6 +3,12 @@ import { Row, Col, Card, Form, Button, Table, Badge, ProgressBar } from 'react-b
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
+// ---------------------------------------------------------
+// 🔴 LIVE BACKEND CONNECTION
+// ---------------------------------------------------------
+const API_BASE = "https://realestateassignment.onrender.com"; 
+// ---------------------------------------------------------
+
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   
@@ -23,18 +29,18 @@ const AdminPanel = () => {
 
   const refreshData = async () => {
     try {
-      const p = await axios.get('http://localhost:5000/projects');
-      const c = await axios.get('http://localhost:5000/clients');
-      const i = await axios.get('http://localhost:5000/contact');
-      const s = await axios.get('http://localhost:5000/subscribe');
+      const p = await axios.get(`${API_BASE}/projects`);
+      const c = await axios.get(`${API_BASE}/clients`);
+      const i = await axios.get(`${API_BASE}/contact`);
+      const s = await axios.get(`${API_BASE}/subscribe`);
       
       setStats({ projects: p.data.length, clients: c.data.length, inquiries: i.data.length, subs: s.data.length });
       setInquiries(i.data);
       setSubscribers(s.data);
-      setRecentProjects(p.data); // Show all projects in dashboard for management
+      setRecentProjects(p.data); 
       setClientsList(c.data);
     } catch (err) {
-      console.log("Server offline");
+      console.log("Server offline or loading...");
     }
   };
 
@@ -45,26 +51,26 @@ const AdminPanel = () => {
             formData.append('name', projData.name);
             formData.append('description', projData.description);
             formData.append('image', projData.image);
-            await axios.post('http://localhost:5000/projects', formData);
+            await axios.post(`${API_BASE}/projects`, formData);
         } else {
             formData.append('name', clientData.name);
             formData.append('designation', clientData.designation);
             formData.append('description', clientData.description);
             formData.append('image', clientData.image);
-            await axios.post('http://localhost:5000/clients', formData);
+            await axios.post(`${API_BASE}/clients`, formData);
         }
         alert("Saved Successfully!");
         refreshData();
-    } catch (e) { alert("Error uploading"); }
+    } catch (e) { alert("Error uploading. Check server connection."); }
   };
 
   // *** DELETE FUNCTION ***
   const handleDelete = async (id, type) => {
       if(!window.confirm("Delete this item?")) return;
       try {
-          await axios.delete(`http://localhost:5000/${type}/${id}`);
+          await axios.delete(`${API_BASE}/${type}/${id}`);
           refreshData();
-      } catch (e) { alert("Error deleting"); }
+      } catch (e) { alert("Error deleting item."); }
   };
 
   // --- COMPONENTS ---
@@ -101,18 +107,18 @@ const AdminPanel = () => {
 
   return (
     // MAIN WRAPPER: FLEXBOX LAYOUT (Solves the "Blank Right Side" issue)
-    <div style={{ display: 'flex', width: '100vw', height: '100vh', background: '#f0f2f5', fontFamily: "'Poppins', sans-serif", overflow: 'hidden' }}>
+    <div style={{ display: 'flex', width: '100vw', minHeight: '100vh', background: '#f0f2f5', fontFamily: "'Poppins', sans-serif", overflowX: 'hidden' }}>
       
       {/* 1. SIDEBAR (Fixed Width, Flex Shrink 0) */}
-      <div style={{ width: '280px', background: '#0e2e50', height: '100%', flexShrink: 0, zIndex: 1000, display: 'flex', flexDirection: 'column' }} className="shadow">
-        <div className="px-4 py-4 mb-2">
+      <div style={{ width: '280px', background: '#0e2e50', minHeight: '100vh', flexShrink: 0, zIndex: 1000 }} className="d-flex flex-column py-4 shadow">
+        <div className="px-4 mb-5">
             <h4 className="fw-bold text-white m-0 d-flex align-items-center">
                 <i className="bi bi-pie-chart-fill me-2 text-primary"></i>
                 Real<span style={{color: '#00aaff'}}>Trust</span>
             </h4>
             <small className="text-white-50 ms-4 ps-1" style={{fontSize:'0.65rem'}}>ADMIN DASHBOARD</small>
         </div>
-        <nav style={{ flex: 1, overflowY: 'auto' }}>
+        <nav className="flex-grow-1 w-100">
             <small className="text-white-50 px-4 mb-2 d-block fw-bold" style={{fontSize:'0.7rem'}}>ANALYTICS</small>
             <SidebarItem id="dashboard" icon="bi-grid-1x2-fill" label="Overview" />
             <div className="my-3"></div>
@@ -122,7 +128,7 @@ const AdminPanel = () => {
             <SidebarItem id="add_project" icon="bi-building-add" label="Add Project" />
             <SidebarItem id="add_client" icon="bi-person-plus-fill" label="Add Client" />
         </nav>
-        <div className="px-3 py-4 mt-auto">
+        <div className="px-3 mt-auto">
             <Link to="/">
                 <Button variant="outline-light" className="w-100 fw-bold py-2" style={{borderRadius: '8px', border:'1px solid rgba(255,255,255,0.1)'}}>
                    Website
@@ -132,7 +138,7 @@ const AdminPanel = () => {
       </div>
 
       {/* 2. MAIN CONTENT (Flex Grow 1 - Forces it to fill ALL remaining space) */}
-      <div style={{ flexGrow: 1, height: '100%', overflowY: 'auto', padding: '30px' }}>
+      <div style={{ flexGrow: 1, padding: '30px', background: '#f0f2f5', minHeight: '100vh', overflowY: 'auto' }}>
         
         {/* Top Header */}
         <div className="d-flex justify-content-between align-items-center mb-4 w-100">
@@ -158,18 +164,19 @@ const AdminPanel = () => {
                         <Card className="border-0 shadow-sm p-0 h-100 w-100" style={{borderRadius: '12px', overflow:'hidden'}}>
                             <Card.Header className="bg-white py-3 px-4 fw-bold border-bottom">Manage Projects</Card.Header>
                             <Table hover className="mb-0 align-middle w-100">
-                                <thead className="bg-light text-muted small"><tr><th className="ps-4">PROJECT</th><th>DETAILS</th><th>ACTION</th></tr></thead>
+                                <thead className="bg-light text-muted small"><tr><th className="ps-4">PROJECT</th><th>DETAILS</th><th>STATUS</th><th>ACTION</th></tr></thead>
                                 <tbody>
                                     {recentProjects.map((p,i) => (
                                         <tr key={i}>
                                             <td className="ps-4 fw-bold"><img src={p.image} className="rounded me-2" width="40" height="40" style={{objectFit:'cover'}}/> {p.name}</td>
                                             <td className="text-muted small">{p.description}</td>
+                                            <td><Badge bg="success" className="px-2">Active</Badge></td>
                                             <td>
                                                 <Button size="sm" variant="outline-danger" onClick={()=>handleDelete(p._id, 'projects')}><i className="bi bi-trash"></i></Button>
                                             </td>
                                         </tr>
                                     ))}
-                                    {recentProjects.length===0 && <tr><td colSpan="3" className="p-4 text-center text-muted">No projects available.</td></tr>}
+                                    {recentProjects.length===0 && <tr><td colSpan="4" className="p-4 text-center text-muted">No projects available.</td></tr>}
                                 </tbody>
                             </Table>
                         </Card>
