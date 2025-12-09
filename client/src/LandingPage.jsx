@@ -9,37 +9,34 @@ import axios from 'axios';
 const API_BASE = "https://realestateassignment.onrender.com"; 
 // ---------------------------------------------------------
 
-// --- DUMMY DATA ---
 const DUMMY_PROJECTS = [
-  { _id: '1', name: 'Modern Villa', description: 'Beverly Hills, CA', details: 'A stunning modern villa located in the exclusive hills. Features 5 bedrooms, infinity pool, and smart home systems.', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80' },
-  { _id: '2', name: 'Luxury Apartment', description: 'New York, NY', details: 'Penthouse suite with panoramic city views. Floor-to-ceiling windows and premium finishes throughout.', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80' },
-  { _id: '3', name: 'Cozy Cottage', description: 'Aspen, CO', details: 'The perfect winter getaway. Features a stone fireplace, heated floors, and ski-in/ski-out access.', image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=600&q=80' },
-  { _id: '4', name: 'Urban Loft', description: 'Chicago, IL', details: 'Industrial-chic loft in the heart of downtown. Exposed brick walls and high ceilings.', image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=600&q=80' },
-  { _id: '5', name: 'Seaside Manor', description: 'Miami, FL', details: 'Historic art-deco restoration in South Beach. Direct beach access and private dock.', image: 'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=600&q=80' }
+  { _id: '1', name: 'Modern Villa', description: 'Beverly Hills, CA', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80' },
+  { _id: '2', name: 'Luxury Apartment', description: 'New York, NY', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80' },
+  { _id: '3', name: 'Cozy Cottage', description: 'Aspen, CO', image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=600&q=80' },
+  { _id: '4', name: 'Urban Loft', description: 'Chicago, IL', image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=600&q=80' },
+  { _id: '5', name: 'Seaside Manor', description: 'Miami, FL', image: 'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=600&q=80' }
 ];
 
 const DUMMY_CLIENTS = [
-  { _id: '1', name: 'Michael Ross', designation: 'Entrepreneur', description: 'DreamHome found me the perfect office space in record time. Their professionalism is unmatched.', image: 'https://randomuser.me/api/portraits/men/32.jpg' },
-  { _id: '2', name: 'Sarah Jenkins', designation: 'Homeowner', description: 'I sold my house above asking price thanks to their incredible marketing strategy. Highly recommended!', image: 'https://randomuser.me/api/portraits/women/44.jpg' },
-  { _id: '3', name: 'David Chen', designation: 'Property Investor', description: 'The ROI analysis provided by DreamHome was spot on. They are true experts in the market.', image: 'https://randomuser.me/api/portraits/men/85.jpg' },
-  { _id: '4', name: 'Emily Clark', designation: 'Interior Designer', description: 'A seamless experience from start to finish. The team really understood my vision.', image: 'https://randomuser.me/api/portraits/women/65.jpg' },
+  { _id: '1', name: 'Michael Ross', designation: 'CEO', description: 'DreamHome found me the perfect office space in record time.', image: 'https://randomuser.me/api/portraits/men/32.jpg' },
+  { _id: '2', name: 'Sarah Jenkins', designation: 'Director', description: 'I sold my house above asking price thanks to their incredible strategy.', image: 'https://randomuser.me/api/portraits/women/44.jpg' },
+  { _id: '3', name: 'David Chen', designation: 'Investor', description: 'The ROI analysis provided by DreamHome was spot on.', image: 'https://randomuser.me/api/portraits/men/85.jpg' },
 ];
 
 const LandingPage = () => {
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
   const [contactForm, setContactForm] = useState({ fullName: '', email: '', mobile: '', city: '' });
-  const [emailSub, setEmailSub] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const projRes = await axios.get(`${API_BASE}/projects`);
-        setProjects(projRes.data.length > 0 ? projRes.data : DUMMY_PROJECTS);
-        const clientRes = await axios.get(`${API_BASE}/clients`);
-        setClients(clientRes.data.length > 0 ? clientRes.data : DUMMY_CLIENTS);
+        const p = await axios.get(`${API_BASE}/projects`);
+        const c = await axios.get(`${API_BASE}/clients`);
+        setProjects(p.data.length > 0 ? p.data : DUMMY_PROJECTS);
+        setClients(c.data.length > 0 ? c.data : DUMMY_CLIENTS);
       } catch (err) {
         setProjects(DUMMY_PROJECTS);
         setClients(DUMMY_CLIENTS);
@@ -50,71 +47,64 @@ const LandingPage = () => {
 
   const handleContactSubmit = async (e) => { 
       e.preventDefault(); 
-      try {
-          await axios.post(`${API_BASE}/contact`, contactForm);
-          alert("Quote Request Sent Successfully!");
-          setContactForm({ fullName: '', email: '', mobile: '', city: '' });
-      } catch (err) { alert("Error sending request."); }
+      try { await axios.post(`${API_BASE}/contact`, contactForm); alert("Request Sent! We will call you shortly."); setContactForm({ fullName: '', email: '', mobile: '', city: '' }); } 
+      catch (err) { alert("Error sending request."); }
   };
 
-  const handleSubscribe = async () => {
-      if(!emailSub) return;
-      try {
-          await axios.post(`${API_BASE}/subscribe`, { email: emailSub });
-          alert("Subscribed Successfully!");
-          setEmailSub('');
-      } catch (err) { alert("Already subscribed."); }
-  };
-
-  const handleReadMore = (project) => { setSelectedProject(project); setShowModal(true); };
+  const handleReadMore = (p) => { setSelectedProject(p); setShowModal(true); };
 
   return (
     <div style={{ fontFamily: "'Poppins', sans-serif", overflowX: 'hidden', width: '100%' }}>
       
-      {/* 1. NAVBAR - UPDATED WITH "DreamHome" */}
-      <Navbar bg="white" expand="lg" fixed="top" className="shadow-sm py-3" style={{zIndex: 1000}}>
+      {/* 1. GLASS NAVBAR */}
+      <Navbar expand="lg" fixed="top" className="py-3 shadow-sm" style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)' }}>
         <Container>
-          <Navbar.Brand href="#" className="fw-bold fs-3 d-flex align-items-center" style={{ color: '#0e2e50', letterSpacing: '-0.5px' }}>
-             <i className="bi bi-house-heart-fill text-primary me-2 fs-2"></i>
-             <span style={{color: '#333'}}>Dream</span><span style={{color: '#0e2e50'}}>Home</span>
+          <Navbar.Brand href="#" className="fw-bold fs-3 d-flex align-items-center">
+             <i className="bi bi-house-heart-fill text-danger me-2 fs-2"></i>
+             <span style={{color: '#0e2e50'}}>Dream</span><span style={{color: '#f05a28'}}>Home</span>
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto text-uppercase fw-bold align-items-center" style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>
-              <Nav.Link href="#home" className="px-3" style={{color: '#333'}}>Home</Nav.Link>
-              <Nav.Link href="#services" className="px-3" style={{color: '#333'}}>Services</Nav.Link>
-              <Nav.Link href="#projects" className="px-3" style={{color: '#333'}}>Projects</Nav.Link>
-              <Nav.Link href="#testimonials" className="px-3" style={{color: '#333'}}>Testimonials</Nav.Link>
-              <Nav.Link href="#contact" className="px-3 text-warning">Contact</Nav.Link>
-              <Link to="/admin">
-                <Button size="sm" className="ms-3 px-4 py-2 fw-bold shadow-sm" style={{background: '#f05a28', border: 'none', borderRadius: '4px', textTransform: 'uppercase', fontSize: '0.75rem'}}>
-                    Admin Panel
-                </Button>
-              </Link>
+          <Navbar.Toggle />
+          <Navbar.Collapse>
+            <Nav className="ms-auto fw-bold text-uppercase small" style={{ letterSpacing: '1px' }}>
+              <Nav.Link href="#home" className="px-3 text-dark">Home</Nav.Link>
+              <Nav.Link href="#services" className="px-3 text-dark">Services</Nav.Link>
+              <Nav.Link href="#projects" className="px-3 text-dark">Properties</Nav.Link>
+              <Nav.Link href="#testimonials" className="px-3 text-dark">Reviews</Nav.Link>
+              <Link to="/admin"><Button size="sm" className="ms-3 px-4 fw-bold" style={{background: '#0e2e50', border:'none'}}>ADMIN</Button></Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
 
-      {/* 2. HERO SECTION */}
-      <div id="home" style={{ position: 'relative', width: '100vw', minHeight: '100vh', backgroundImage: "url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')", backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', paddingTop: '80px' }}>
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)' }}></div>
+      {/* 2. PARALLAX HERO SECTION */}
+      <div id="home" style={{ 
+          position: 'relative', width: '100vw', minHeight: '100vh', 
+          background: "url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1950&q=80') fixed center/cover",
+          display: 'flex', alignItems: 'center', paddingTop: '80px' 
+      }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(14, 46, 80, 0.9) 0%, rgba(14, 46, 80, 0.4) 100%)' }}></div>
           <Container style={{ position: 'relative', zIndex: 2 }}>
             <Row className="align-items-center">
                 <Col lg={7} className="text-white mb-5 mb-lg-0">
-                    <h1 style={{ fontSize: '3.5rem', fontWeight: '800', lineHeight: '1.2', textShadow: '0 4px 6px rgba(0,0,0,0.3)' }}>Consultation,<br/>Design,<br/>& Marketing</h1>
-                    <p className="lead mt-4 text-light opacity-90 fw-light" style={{maxWidth: '500px'}}>We provide world-class real estate services tailored to your unique needs. Let's build your future together.</p>
+                    <span className="text-warning fw-bold small letter-spacing-2">PREMIUM REAL ESTATE</span>
+                    <h1 className="display-3 fw-bold my-3">Find Your <span style={{color:'#f05a28'}}>Dream</span> Place</h1>
+                    <p className="lead opacity-75 mb-4" style={{maxWidth:'500px'}}>We don't just sell houses. We help you find a place where your memories will live forever.</p>
+                    <Button size="lg" className="rounded-pill px-5 fw-bold" style={{background:'#f05a28', border:'none'}}>EXPLORE PROPERTIES</Button>
                 </Col>
                 <Col lg={5}>
-                    <div className="p-4 p-md-5 rounded" style={{ backgroundColor: 'rgba(14, 46, 80, 0.95)', color: 'white', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}>
-                        <h3 className="fw-bold mb-2">Get a Free Consultation</h3>
-                        <p className="mb-4 small text-white-50">Fill out the form below and we will contact you shortly.</p>
+                    <div className="p-4 rounded-3 shadow-lg" style={{ background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(15px)', border: '1px solid rgba(255,255,255,0.2)' }}>
+                        <h3 className="fw-bold text-white mb-1">Get a Quote</h3>
+                        <p className="text-white-50 small mb-3">Expert consultation is just a click away.</p>
                         <Form onSubmit={handleContactSubmit}>
-                            <Form.Group className="mb-3"><Form.Control placeholder="Full Name" style={{ background: '#fff', border: 'none', height: '50px' }} value={contactForm.fullName} onChange={e => setContactForm({...contactForm, fullName: e.target.value})}/></Form.Group>
-                            <Form.Group className="mb-3"><Form.Control placeholder="Email Address" style={{ background: '#fff', border: 'none', height: '50px' }} value={contactForm.email} onChange={e => setContactForm({...contactForm, email: e.target.value})}/></Form.Group>
-                            <Form.Group className="mb-3"><Form.Control placeholder="Mobile Number" style={{ background: '#fff', border: 'none', height: '50px' }} value={contactForm.mobile} onChange={e => setContactForm({...contactForm, mobile: e.target.value})}/></Form.Group>
-                            <Form.Group className="mb-4"><Form.Control placeholder="City / Area" style={{ background: '#fff', border: 'none', height: '50px' }} value={contactForm.city} onChange={e => setContactForm({...contactForm, city: e.target.value})}/></Form.Group>
-                            <Button type="submit" className="w-100 fw-bold py-3 rounded-1 shadow-sm" style={{ backgroundColor: '#f05a28', border: 'none', textTransform: 'uppercase', letterSpacing: '1px' }}>GET QUICK QUOTE</Button>
+                            {['Full Name', 'Email Address', 'Mobile Number', 'City / Area'].map((holder, i) => (
+                                <Form.Control key={i} placeholder={holder} className="mb-3 border-0" style={{height:'50px', background:'rgba(255,255,255,0.9)'}} 
+                                    onChange={e => {
+                                        const key = ['fullName','email','mobile','city'][i];
+                                        setContactForm(prev => ({...prev, [key]: e.target.value}))
+                                    }} 
+                                />
+                            ))}
+                            <Button type="submit" className="w-100 fw-bold py-3" style={{background: '#f05a28', border:'none'}}>SEND REQUEST</Button>
                         </Form>
                     </div>
                 </Col>
@@ -122,37 +112,59 @@ const LandingPage = () => {
           </Container>
       </div>
 
-      {/* 3. SERVICES */}
-      <div id="services">
-        <Container className="py-5 text-center">
-            <Row className="justify-content-center">
-                <Col md={10} className="mb-5">
-                    <h4 className="fw-bold text-dark" style={{color: '#0e2e50'}}>Not Your Average Realtor</h4>
-                    <div style={{width: '60px', height: '4px', background: '#f05a28', margin: '15px auto'}}></div>
-                    <p className="text-muted w-75 mx-auto">DreamHome is an innovative property group. We provide quality service to build relationships with clients.</p>
-                </Col>
-            </Row>
-            <Row>
-                <Col md={4} className="px-4 mb-4"><div className="p-3"><h5 className="fw-bold mb-3">Potential ROI</h5><p className="text-muted small">We analyze every detail to ensure you get the best return on investment.</p></div></Col>
-                <Col md={4} className="px-4 mb-4"><div className="p-3 border-start border-end"><h5 className="fw-bold mb-3">Design</h5><p className="text-muted small">Our interior design background makes us the perfect guide for renovation.</p></div></Col>
-                <Col md={4} className="px-4 mb-4"><div className="p-3"><h5 className="fw-bold mb-3">Marketing</h5><p className="text-muted small">We bring professional photography and digital marketing plans to every listing.</p></div></Col>
-            </Row>
-        </Container>
+      {/* 3. STATS STRIP */}
+      <div className="py-5 text-white text-center" style={{background: '#0e2e50'}}>
+          <Container>
+              <Row>
+                  <Col md={3} className="mb-4 mb-md-0"><h2 className="fw-bold text-warning">150+</h2><small>Premium Projects</small></Col>
+                  <Col md={3} className="mb-4 mb-md-0"><h2 className="fw-bold text-warning">850+</h2><small>Happy Families</small></Col>
+                  <Col md={3} className="mb-4 mb-md-0"><h2 className="fw-bold text-warning">12</h2><small>Years Experience</small></Col>
+                  <Col md={3}><h2 className="fw-bold text-warning">24/7</h2><small>Support Available</small></Col>
+              </Row>
+          </Container>
       </div>
 
-      {/* 4. PROJECTS */}
-      <div id="projects" className="py-5 bg-white">
+      {/* 4. SERVICES */}
+      <Container id="services" className="py-5 text-center">
+        <div className="mb-5">
+            <small className="text-danger fw-bold">OUR SERVICES</small>
+            <h2 className="fw-bold text-dark">Why Choose DreamHome?</h2>
+            <div style={{width:'60px', height:'4px', background:'#f05a28', margin:'15px auto'}}></div>
+        </div>
+        <Row className="g-4">
+            {[{t:'ROI Analysis', i:'bi-graph-up-arrow'}, {t:'Interior Design', i:'bi-palette'}, {t:'Legal Support', i:'bi-shield-check'}].map((s,i) =>(
+                <Col md={4} key={i}>
+                    <div className="p-4 h-100 border rounded-3 hover-shadow" style={{transition: 'transform 0.3s'}}>
+                        <div className="mb-3 text-primary"><i className={`bi ${s.i} display-4`}></i></div>
+                        <h5 className="fw-bold">{s.t}</h5>
+                        <p className="text-muted small">We provide top-tier service ensuring your property journey is smooth and profitable.</p>
+                    </div>
+                </Col>
+            ))}
+        </Row>
+      </Container>
+
+      {/* 5. PROJECTS GRID */}
+      <div id="projects" className="py-5 bg-light">
         <Container>
-         <h3 className="text-center fw-bold mb-5" style={{color: '#0e2e50'}}>Our Projects</h3>
-         <Row className="justify-content-center g-4">
-            {projects.slice(0, 5).map((p, i) => (
-                <Col key={i} lg={2} md={4} sm={6} xs={12} style={{ minWidth: '19%' }}>
-                    <Card className="h-100 border-0 shadow-sm project-card">
-                        <div style={{ height: '180px', overflow: 'hidden' }}><Card.Img variant="top" src={p.image} style={{ height: '100%', objectFit: 'cover' }} /></div>
-                        <Card.Body className="text-center p-3">
-                            <h6 className="fw-bold mb-1 text-dark">{p.name}</h6>
-                            <p className="text-muted small text-uppercase mb-3" style={{fontSize: '0.65rem'}}>{p.description}</p>
-                            <Button size="sm" className="rounded-0 text-white fw-bold w-100" style={{ background: '#f05a28', border: 'none', fontSize: '0.7rem', padding: '8px 0' }} onClick={() => handleReadMore(p)}>READ MORE</Button>
+         <div className="d-flex justify-content-between align-items-end mb-5">
+             <div><h2 className="fw-bold text-dark m-0">Featured Properties</h2><p className="text-muted m-0">Handpicked luxury for you.</p></div>
+             <Button variant="outline-dark" className="d-none d-md-block">View All</Button>
+         </div>
+         <Row className="g-4">
+            {projects.slice(0, 6).map((p, i) => (
+                <Col key={i} lg={4} md={6}>
+                    <Card className="h-100 border-0 shadow-sm" style={{cursor:'pointer', transition:'transform 0.2s'}} 
+                          onMouseOver={e=>e.currentTarget.style.transform='translateY(-5px)'} 
+                          onMouseOut={e=>e.currentTarget.style.transform='translateY(0)'}>
+                        <div style={{height:'250px', overflow:'hidden', position:'relative'}}>
+                            <Card.Img variant="top" src={p.image} style={{height:'100%', objectFit:'cover'}} />
+                            <Badge bg="danger" style={{position:'absolute', top:'10px', left:'10px'}}>FOR SALE</Badge>
+                        </div>
+                        <Card.Body>
+                            <h5 className="fw-bold mb-1">{p.name}</h5>
+                            <p className="text-muted small mb-3"><i className="bi bi-geo-alt-fill text-danger me-1"></i>{p.description}</p>
+                            <Button size="sm" className="w-100 fw-bold" style={{background:'#0e2e50', border:'none'}} onClick={() => handleReadMore(p)}>VIEW DETAILS</Button>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -161,38 +173,60 @@ const LandingPage = () => {
         </Container>
       </div>
 
-      {/* 5. TESTIMONIALS */}
-      <div id="testimonials" className="py-5" style={{backgroundColor: '#f8f9fa'}}>
-          <Container>
-            <div className="text-center mb-5"><div style={{ width: '15px', height: '15px', background: '#00aaff', borderRadius: '50%', margin: '0 auto 20px' }}></div><h2 className="fw-bold" style={{color: '#0e2e50'}}>Happy Clients</h2></div>
-            <Row className="justify-content-center">
-                {clients.slice(0, 4).map((c, i) => (
-                    <Col key={i} lg={3} md={6} className="mb-4">
-                        <Card className="border-0 shadow-sm h-100 text-center py-4 px-3" style={{borderRadius: '10px'}}>
-                            <div className="mx-auto mb-3" style={{width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden', border: '4px solid #e9ecef'}}><img src={c.image} alt="client" style={{width: '100%', height: '100%', objectFit: 'cover'}} /></div>
-                            <Card.Body className="p-0"><p className="small text-muted fst-italic mb-3">"{c.description}"</p><h6 className="fw-bold text-dark mb-0">{c.name}</h6><small className="text-primary fw-bold" style={{fontSize: '0.7rem', textTransform: 'uppercase'}}>{c.designation}</small></Card.Body>
-                        </Card>
-                    </Col>
-                ))}
-            </Row>
-          </Container>
-      </div>
+      {/* 6. TESTIMONIALS */}
+      <Container id="testimonials" className="py-5 text-center">
+        <h2 className="fw-bold mb-5">Client Stories</h2>
+        <Row className="justify-content-center">
+            {clients.slice(0, 3).map((c, i) => (
+                <Col key={i} md={4} className="mb-4">
+                    <Card className="border-0 shadow-sm p-4 h-100">
+                        <div className="mx-auto mb-3"><img src={c.image} className="rounded-circle border border-3 border-white shadow" width="80" height="80" style={{objectFit:'cover'}} /></div>
+                        <p className="fst-italic text-muted">"{c.description.substring(0,80)}..."</p>
+                        <h6 className="fw-bold m-0">{c.name}</h6>
+                        <small className="text-primary fw-bold text-uppercase">{c.designation}</small>
+                    </Card>
+                </Col>
+            ))}
+        </Row>
+      </Container>
 
-      {/* 6. SUBSCRIBER SECTION */}
-      <div id="contact" style={{ background: '#00aaff', padding: '70px 0', color: 'white' }}>
+      {/* 7. FOOTER */}
+      <div className="text-white py-5" style={{background:'#1a1a1a'}}>
           <Container>
-              <Row className="align-items-center">
-                  <Col md={6} className="text-center text-md-start mb-4 mb-md-0"><h3 className="fw-bold mb-2">Subscribe to Our Newsletter</h3><p className="mb-0 text-white-50">Join our mailing list for updates.</p></Col>
-                  <Col md={6}><div className="d-flex justify-content-center justify-content-md-end"><input type="email" placeholder="Enter email" className="form-control me-2 border-0 shadow-sm" style={{height: '50px', maxWidth: '300px'}} value={emailSub} onChange={(e) => setEmailSub(e.target.value)} /><Button style={{ height: '50px', padding: '0 30px', background: '#333', border: 'none', fontWeight: 'bold' }} onClick={handleSubscribe}>SUBSCRIBE</Button></div></Col>
+              <Row>
+                  <Col md={4} className="mb-4">
+                      <h4 className="fw-bold mb-3">Dream<span className="text-primary">Home</span></h4>
+                      <p className="small opacity-50">Building dreams, one home at a time. The most trusted name in real estate.</p>
+                  </Col>
+                  <Col md={4} className="mb-4">
+                      <h5 className="fw-bold">Contact Us</h5>
+                      <p className="small m-0">123 Market St, San Francisco</p>
+                      <p className="small m-0">support@dreamhome.com</p>
+                      <p className="small m-0">+1 (555) 123-4567</p>
+                  </Col>
+                  <Col md={4}>
+                      <h5 className="fw-bold">Follow Us</h5>
+                      <div className="d-flex gap-3 fs-4">
+                          <i className="bi bi-facebook cursor-pointer"></i>
+                          <i className="bi bi-instagram cursor-pointer"></i>
+                          <i className="bi bi-twitter cursor-pointer"></i>
+                          <i className="bi bi-linkedin cursor-pointer"></i>
+                      </div>
+                  </Col>
               </Row>
+              <hr className="opacity-25 my-4"/>
+              <p className="text-center small opacity-50 m-0">&copy; 2023 DreamHome Inc. All Rights Reserved.</p>
           </Container>
       </div>
-
-      <div className="bg-dark text-white text-center py-4"><small className="opacity-50">&copy; 2023 DreamHome. All Rights Reserved.</small></div>
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg">
-        <Modal.Header closeButton className="border-0"><Modal.Title className="fw-bold text-dark">{selectedProject?.name}</Modal.Title></Modal.Header>
-        <Modal.Body>{selectedProject && (<Row><Col md={6}><img src={selectedProject.image} className="img-fluid rounded mb-3 w-100 shadow-sm" /></Col><Col md={6}><h5 className="fw-bold text-primary mb-3">Project Overview</h5><p className="text-muted fw-bold mb-4">{selectedProject.description}</p><p>{selectedProject.details || "Details coming soon."}</p><div className="mt-4"><Button variant="danger" className="w-100 py-2 fw-bold" style={{background: '#f05a28', border:'none'}}>Contact Agent</Button></div></Col></Row>)}</Modal.Body>
+        <Modal.Header closeButton><Modal.Title className="fw-bold">{selectedProject?.name}</Modal.Title></Modal.Header>
+        <Modal.Body>
+            <img src={selectedProject?.image} className="img-fluid rounded w-100 mb-3" />
+            <p className="lead">{selectedProject?.description}</p>
+            <p className="text-muted">Experience luxury living in this magnificent property. Featuring state-of-the-art amenities, spacious interiors, and breathtaking views.</p>
+            <Button className="w-100 fw-bold py-2" style={{background:'#f05a28', border:'none'}}>Schedule Viewing</Button>
+        </Modal.Body>
       </Modal>
     </div>
   );
