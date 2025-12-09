@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const API_BASE = "https://realestateassignment.onrender.com"; 
 
-// --- INSTANT DATA (No Waiting) ---
+// --- INSTANT DATA (For Immediate Visibility) ---
 const DATA_PROJECTS = [
   { _id: '1', name: 'Modern Villa', description: 'Beverly Hills, CA', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80' },
   { _id: '2', name: 'Luxury Apartment', description: 'New York, NY', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80' },
@@ -33,6 +33,8 @@ const LandingPage = () => {
       try {
         const p = await axios.get(`${API_BASE}/projects`);
         if (p.data.length > 0) setProjects(p.data);
+        const c = await axios.get(`${API_BASE}/clients`);
+        if (c.data.length > 0) setClients(c.data);
       } catch (err) { console.log("Using instant data"); }
     };
     fetchData();
@@ -108,7 +110,7 @@ const LandingPage = () => {
                         <Card.Body>
                             <h5 className="fw-bold">{p.name}</h5>
                             <p className="text-muted small">{p.description}</p>
-                            <Button size="sm" className="w-100" style={{background:'#0e2e50'}} onClick={() => handleReadMore(p)}>DETAILS</Button>
+                            <Button size="sm" className="w-100" style={{background:'#0e2e50', border:'none'}} onClick={() => handleReadMore(p)}>DETAILS</Button>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -117,7 +119,6 @@ const LandingPage = () => {
         </Container>
       </div>
 
-      {/* REVIEWS: ALWAYS VISIBLE */}
       <div id="testimonials" style={{ scrollMarginTop: '100px', padding: '80px 0', background: '#0e2e50' }}>
         <Container className="text-center">
             <h2 className="fw-bold mb-5 text-white">Client Stories</h2>
@@ -136,7 +137,12 @@ const LandingPage = () => {
         </Container>
       </div>
 
-      <div className="text-white py-4 text-center" style={{background:'#111'}}><small>&copy; 2023 DreamHome.</small></div>
+      {/* NEW FOOTER ADDED HERE */}
+      <div className="text-white py-4 text-center" style={{background:'#111'}}>
+          <Container>
+              <p className="m-0 small opacity-50">&copy; {new Date().getFullYear()} DreamHome. All Rights Reserved.</p>
+          </Container>
+      </div>
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton><Modal.Title>{selectedProject?.name}</Modal.Title></Modal.Header>
