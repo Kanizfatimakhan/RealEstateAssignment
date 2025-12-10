@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const API_BASE = "https://realestateassignment.onrender.com"; 
 
-// --- INSTANT DATA (For Immediate Visibility) ---
+// --- INSTANT DUMMY DATA (No Waiting) ---
 const DATA_PROJECTS = [
   { _id: '1', name: 'Modern Villa', description: 'Beverly Hills, CA', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80' },
   { _id: '2', name: 'Luxury Apartment', description: 'New York, NY', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80' },
@@ -15,37 +15,38 @@ const DATA_PROJECTS = [
   { _id: '6', name: 'Skyline Penthouse', description: 'Seattle, WA', image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80' }
 ];
 
-const DATA_CLIENTS = [
-  { _id: '1', name: 'Michael Ross', designation: 'CEO', description: 'DreamHome found me the perfect office space in record time.', image: 'https://randomuser.me/api/portraits/men/32.jpg' },
-  { _id: '2', name: 'Sarah Jenkins', designation: 'Director', description: 'I sold my house above asking price thanks to their incredible strategy.', image: 'https://randomuser.me/api/portraits/women/44.jpg' },
-  { _id: '3', name: 'David Chen', designation: 'Investor', description: 'The ROI analysis provided by DreamHome was spot on.', image: 'https://randomuser.me/api/portraits/men/85.jpg' },
-];
-
 const LandingPage = () => {
   const [projects, setProjects] = useState(DATA_PROJECTS);
-  const [clients, setClients] = useState(DATA_CLIENTS);
   const [contactForm, setContactForm] = useState({ fullName: '', email: '', mobile: '', city: '' });
+  const [emailSub, setEmailSub] = useState(''); // State for subscribe form
   const [showModal, setShowModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+
+  // Hardcoded Client Data for guaranteed visibility
+  const visibleClients = [
+    { name: 'Michael Ross', designation: 'CEO', description: 'Found me the perfect office space in record time.', image: 'https://randomuser.me/api/portraits/men/32.jpg' },
+    { name: 'Sarah Jenkins', designation: 'Director', description: 'Sold my house above asking price! Incredible strategy.', image: 'https://randomuser.me/api/portraits/women/44.jpg' },
+    { name: 'David Chen', designation: 'Investor', description: 'The ROI analysis provided was spot on.', image: 'https://randomuser.me/api/portraits/men/85.jpg' },
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const p = await axios.get(`${API_BASE}/projects`);
         if (p.data.length > 0) setProjects(p.data);
-        const c = await axios.get(`${API_BASE}/clients`);
-        if (c.data.length > 0) setClients(c.data);
       } catch (err) { console.log("Using instant data"); }
     };
     fetchData();
   }, []);
 
-  const handleContactSubmit = async (e) => { e.preventDefault(); try { await axios.post(`${API_BASE}/contact`, contactForm); alert("Request Sent!"); } catch (err) { alert("Error sending."); } };
+  const handleContactSubmit = async (e) => { e.preventDefault(); try { await axios.post(`${API_BASE}/contact`, contactForm); alert("Request Sent!"); setContactForm({ fullName: '', email: '', mobile: '', city: '' }); } catch (err) { alert("Error sending."); } };
+  const handleSubscribe = async () => { if(!emailSub) return; try { await axios.post(`${API_BASE}/subscribe`, { email: emailSub }); alert("Subscribed!"); setEmailSub(''); } catch (err) { alert("Already subscribed."); } };
   const handleReadMore = (p) => { setSelectedProject(p); setShowModal(true); };
 
   return (
     <div style={{ fontFamily: "'Poppins', sans-serif", overflowX: 'hidden', width: '100%' }}>
       
+      {/* 1. NAVBAR */}
       <Navbar expand="lg" fixed="top" className="py-3 shadow-sm bg-white">
         <Container>
           <Navbar.Brand href="#" className="fw-bold fs-3 d-flex align-items-center">
@@ -65,6 +66,7 @@ const LandingPage = () => {
         </Container>
       </Navbar>
 
+      {/* 2. HERO */}
       <div id="home" style={{ position: 'relative', width: '100vw', minHeight: '100vh', background: "url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1950&q=80') center/cover", display: 'flex', alignItems: 'center', paddingTop: '80px' }}>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.3))' }}></div>
           <Container style={{ position: 'relative', zIndex: 2 }}>
@@ -88,6 +90,7 @@ const LandingPage = () => {
           </Container>
       </div>
 
+      {/* 3. SERVICES */}
       <div id="services" style={{ scrollMarginTop: '100px', padding: '60px 0', background: '#fff' }}>
         <Container className="text-center">
             <h2 className="fw-bold mb-5">Our Services</h2>
@@ -99,6 +102,7 @@ const LandingPage = () => {
         </Container>
       </div>
 
+      {/* 4. PROJECTS */}
       <div id="projects" style={{ scrollMarginTop: '100px', padding: '60px 0', background: '#f8f9fa' }}>
         <Container>
          <h2 className="text-center fw-bold mb-5">Featured Properties</h2>
@@ -110,7 +114,7 @@ const LandingPage = () => {
                         <Card.Body>
                             <h5 className="fw-bold">{p.name}</h5>
                             <p className="text-muted small">{p.description}</p>
-                            <Button size="sm" className="w-100" style={{background:'#0e2e50', border:'none'}} onClick={() => handleReadMore(p)}>DETAILS</Button>
+                            <Button size="sm" className="w-100" style={{background:'#0e2e50'}} onClick={() => handleReadMore(p)}>DETAILS</Button>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -119,11 +123,12 @@ const LandingPage = () => {
         </Container>
       </div>
 
+      {/* 5. REVIEWS (Guaranteed Visible) */}
       <div id="testimonials" style={{ scrollMarginTop: '100px', padding: '80px 0', background: '#0e2e50' }}>
         <Container className="text-center">
             <h2 className="fw-bold mb-5 text-white">Client Stories</h2>
             <Row className="justify-content-center g-4">
-                {clients.map((c, i) => (
+                {visibleClients.map((c, i) => (
                     <Col key={i} lg={4} md={6} sm={12} xs={12}>
                         <Card className="border-0 shadow-lg p-4 h-100">
                             <div className="mx-auto mb-3"><img src={c.image} className="rounded-circle" width="80" height="80" style={{objectFit:'cover'}}/></div>
@@ -136,8 +141,20 @@ const LandingPage = () => {
             </Row>
         </Container>
       </div>
+      
+      {/* 6. SUBSCRIBE SECTION (Brought Back) */}
+      <div className="py-5 text-center" style={{ background: '#f05a28', color: 'white' }}>
+          <Container>
+              <h4 className="fw-bold mb-3">Join Our Newsletter</h4>
+              <p className="mb-4">Get the latest property deals straight to your inbox.</p>
+              <div className="d-flex justify-content-center">
+                  <Form.Control type="email" placeholder="Enter your email" className="me-2" style={{maxWidth: '300px', height: '50px'}} onChange={(e) => setEmailSub(e.target.value)} value={emailSub}/>
+                  <Button onClick={handleSubscribe} style={{ height: '50px', background: '#0e2e50', border: 'none' }}>Subscribe</Button>
+              </div>
+          </Container>
+      </div>
 
-      {/* NEW FOOTER ADDED HERE */}
+      {/* 7. FOOTER (Brought Back) */}
       <div className="text-white py-4 text-center" style={{background:'#111'}}>
           <Container>
               <p className="m-0 small opacity-50">&copy; {new Date().getFullYear()} DreamHome. All Rights Reserved.</p>
